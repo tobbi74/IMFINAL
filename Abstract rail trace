@@ -1,0 +1,79 @@
+PImage scream;
+
+class Particle {
+  float x;
+  float y;
+  ArrayList<PVector> history;
+
+  Particle(float x, float y) {
+    this.x = x;
+    this.y = y;
+    this.history = new ArrayList<PVector>();
+  }
+
+  void update() {
+    this.x += random(-10, 10);
+    this.y += random(-10, 10);
+    for (PVector v : this.history) {
+      v.x += random(-2, 2);
+      v.y += random(-2, 2);
+    }
+
+    PVector v = new PVector(this.x, this.y);
+    this.history.add(v); 
+    if (this.history.size() > 100) {
+      this.history.remove(0);
+    }
+  }
+
+  void show() {
+    //Stroke(c);
+    float a = random(height);
+    float b = random(width);
+    color c = scream.get(int(a), int(b));
+    stroke(c,50);
+    fill(c,50);
+    line(this.x, this.y, this.x, this.y);
+
+    noFill();
+    beginShape();
+    for (PVector pos : history) {
+      //fill(c);
+      //ellipse(pos.x, pos.y, i, i);
+      vertex(pos.x, pos.y);
+    }
+    endShape();
+  }
+}
+
+ArrayList<Particle> particles = new ArrayList<Particle>();
+
+
+
+void setup() {
+  size (594, 750);
+  scream = loadImage("scream.jpg");
+  //background(0);
+  noStroke();
+} 
+
+void mousePressed() {
+  particles.add(new Particle(mouseX, mouseY));
+}
+
+
+void draw() {
+  //image(scream, 0, 0);
+  //float a = random(width);
+  //float b = random(height);
+  //float c = random(width);
+  //float d = random(height);
+  //color e = scream.get(int(a), int(b));
+  //fill(e);
+  //line(a,b,c,d);
+  
+  for (Particle p : particles) {
+    p.update();
+    p.show();
+  }
+}
