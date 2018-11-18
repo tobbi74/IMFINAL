@@ -1,0 +1,45 @@
+PImage scream;
+
+class Particle {
+  float x;
+  float y;
+
+  Particle(float x, float y) {
+    this.x = x;
+    this.y = y;
+  }
+  void update() {
+    this.x += random(-10, 10);
+    this.y += random(-10, 10);
+  }
+  void show() {
+    noStroke();
+    color c = scream.get(int(x), int(y));
+    fill(c);
+    ellipse(this.x, this.y, 10, 10);
+  }
+}
+
+Particle[] particle = new Particle[100];
+
+void setup() {
+  size (594, 750);
+  scream = loadImage("scream.jpg");
+  background(0);
+  noStroke();
+} 
+
+void mousePressed() {
+  for (int i = 0; i <100; i++) {
+    particle[i] = new Particle(mouseX, mouseY);
+  }
+}
+
+void draw() {
+  if (mousePressed==true) {
+    for (int i = 0; i < 100; i++) {
+      particle[i].update();
+      particle[i].show();
+    }
+  }
+}
