@@ -1,3 +1,5 @@
+//ref from https://www.openprocessing.org/sketch/602711
+
 PImage scream;      // scream image
 
 //aimed direction
