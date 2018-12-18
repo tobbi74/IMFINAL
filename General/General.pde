@@ -1,101 +1,106 @@
-import processing.video.*;
-import processing.serial.*;
+//Author Tobbi Vu
+//inspired by Daniel Shiffman's tutorials and source from openprocessing.org
+
+import processing.video.*; //import the video capture from camera
+import processing.serial.*; //import the port that write Arduino values
 
 import ddf.minim.*;
 import ddf.minim.signals.*;
-import ddf.minim.analysis.*;  //importing library's
+import ddf.minim.analysis.*;  //importing library's audio
 import ddf.minim.effects.*;
 
-Minim minim;
-AudioPlayer song;
+Minim minim; //declare objects for class Minim
 
-Serial myPort; 
-int val;                                 // Data received from the serial port
+Serial myPort; //declare objects for class Serial
+int val; // Data received from the serial port
 
-Capture video;
-
-void captureEvent(Capture video) {
+Capture video; //declare objects for Capture
+void captureEvent(Capture video) { 
   video.read();
 }
-
-int randCase;
-int mouseClick;//c
-
 
 AudioPlayer player_1;
 AudioPlayer player_2;
 AudioPlayer player_3;
-AudioPlayer player_4;  // declare objects
+AudioPlayer player_4;  // declare objects for audio
 AudioPlayer player_5;
 AudioPlayer player_6;
 AudioPlayer player_7;
 AudioPlayer player_8;
 
+int randCase; //value for random painting style
+int mouseClick; //style c, count the number of mouse click
+
 void setup() {
-  size(1920, 1080);
-  //size(1440, 900);
+  //size(1920, 1080);
+  size(1440, 900);
   background(0);
   noStroke();
-  frameRate(30);
+  frameRate(30); //setting small framRate to reduce lagging
 
-  println(Serial.list());
+  println(Serial.list()); // Print a list of the serial ports for debugging purposes
   String portName = Serial.list()[2];
   myPort = new Serial(this, portName, 9600);
 
   colorMode(RGB, 255, 255, 255, 100);
-  video = new Capture(this, "name=HD Pro Webcam C920,size=1920x1080,fps=30");
-  //video = new Capture(this, "name=HD Pro Webcam C920,size=1440x900,fps=30");
-  video.start();
 
   minim = new Minim(this);
-
   player_1 = minim.loadFile("c60.mp3");
   player_2 = minim.loadFile("d62.mp3");
   player_3 = minim.loadFile("e64.mp3");
   player_4 = minim.loadFile("f65.mp3");
-  player_5 = minim.loadFile("g67.mp3");
+  player_5 = minim.loadFile("g67.mp3"); //import the mp3 file playing the notes
   player_6 = minim.loadFile("a69.mp3");
   player_7 = minim.loadFile("b71.mp3");
   player_8 = minim.loadFile("c72.mp3");
 
-  //String[] cameras = Capture.list();
-  //if (cameras.length == 0) {
-  //  println("There are no cameras available for capture.");
-  //  exit();
-  //} else {
-  //  println("Available cameras:");
-  //  for (int i = 0; i < cameras.length; i++) {
-  //    println(cameras[i]);
-  //  }
-
-  // The camera can be initialized directly using an 
-  // element from the array returned by list():
-  //video = new Capture(this, 1440, 900, cameras[0]);
-  //video.start();
+  String[] cameras = Capture.list();
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      println(cameras[i]);
+    }
+    //The camera can be initialized directly using an 
+    //element from the array returned by list()
+    //change 1440 and 900 to the size of the screen
+    video = new Capture(this, 1440, 900, cameras[0]); 
+    video.start();
+  }
 }
-
-
 
 void keyPressed() {
+  //when any key (on computer) or red button (Arduino) is pressed,
+  //reset background 
   background(0);
-  for (int i=particles.size(); i-- != 0; particles.remove(i)); //a
-  for (int i= particle1.size(); i-- != 0; particle1.remove(i)); //b
-  for (int i= brushes.size(); i-- != 0; brushes.remove(i)); //d
-
-  randCase = (int) random(0, 7);
-  mouseClick=0; //c
   noStroke();
 
-  diam = startDiam;
+  //remove all the strokes (of style a,b,d) from the last painting
+  for (int i=particles.size(); i-- != 0; particles.remove(i)); //style a
+  for (int i= particle1.size(); i-- != 0; particle1.remove(i)); //style b
+  for (int i= brushes.size(); i-- != 0; brushes.remove(i)); //style d
+
+  //choose a random style
+  randCase = (int) random(0, 7);
+
+  mouseClick=0; //style c, reset the count of mouseClick
+
+  diam = startDiam; //style e, reset the diameter of the circle
 }
 
-
 void draw() {
+  //comment line 97-171 and dis-comment line 172-174 to test without Arduino
+  //this makes style 4 and 6 work differently
+
+  //if the port receive any value from Arduino, read the value
   if (myPort.available() > 0) {
-    serial();
+    init();
     val = myPort.read();
     println(val);
 
+    //if button is pressed, then play the note + mousePressed is true and vice versa  
     if (val == 'a') {
       player_1.cue(0);                    
       player_1.play();
@@ -160,26 +165,31 @@ void draw() {
     if (val=='H') {
       mousePressed = false;
     }  
-    if (val == 'i') {
+    if (val == 'i') { //the red button acts as keyPressed
       keyPressed();
     }
-  }
+  } 
+  //if (mousePressed) { 
+  //  init();
+  //}
   paint();
 }
 
-
-void serial() {
+void init() {
+  //when button is pressed
+  //choose random x,y position
   mouseX = (int) random(width);
   mouseY = (int) random(height);
 
-  // a. abstract rail trace
+  // style a, add new particle
   particles.add(new Particle(mouseX, mouseY));
 
-  //b. pointilism
+  //style b, , add new particle
   particle1.add(new Particle1(mouseX, mouseY));
 }
 
 void paint() {
+  //start painting when mouse is pressed with the randomly chosen style
   if (randCase == 0) {
     println("case 0");
     if (mousePressed == true) {
@@ -222,7 +232,7 @@ void paint() {
     if (mousePressed == true) {
       triangles();
     }
-  } else if (randCase == 6) {//need fix
+  } else if (randCase == 6) {
     println("case 6");
     if (mousePressed == true) {
       computerArt();
