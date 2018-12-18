@@ -1,8 +1,7 @@
-
 const int but1 = 2;
 const int but2 = 3;
 const int but3 = 4;
-const int but4 = 5;    //press buttons
+const int but4 = 5;    //press buttons pin
 const int but5 = 6;
 const int but6 = 7;
 const int but7 = 8;
@@ -12,7 +11,7 @@ const int but9 = 10;
 const int led1 = 11;
 const int led2 = 12;
 const int led3 = 13;
-const int led4 = A5;   //led light
+const int led4 = A5;   //LEDs pin
 const int led5 = A4;
 const int led6 = A3;
 const int led7 = A2;
@@ -23,7 +22,7 @@ int lastBut1;
 int lastBut2;
 int lastBut3;
 int lastBut4;
-int lastBut5;
+int lastBut5;   //remember the last state of the 
 int lastBut6;
 int lastBut7;
 int lastBut8;
@@ -62,14 +61,20 @@ void loop() {
   int reading2 = digitalRead(but2);
   int reading3 = digitalRead(but3);
   int reading4 = digitalRead(but4);
-  int reading5 = digitalRead(but5);
+  int reading5 = digitalRead(but5);    //reading the present button state
   int reading6 = digitalRead(but6);
   int reading7 = digitalRead(but7);
   int reading8 = digitalRead(but8);
   int reading9 = digitalRead(but9);
 
 
-  if (lastBut1 == LOW && reading1 == HIGH) { //a
+//check the last button state and the present state to know if the button is pressed or not
+//this will prevent Arduino from misreading the state if the button is "bouncing"
+
+//button pressed => LED on + Arduino writes value to the port
+//button released => LED off + Arduino writes value to the port
+
+  if (lastBut1 == LOW && reading1 == HIGH) { //a  
     digitalWrite(led1, HIGH);
     Serial.write('a');
   }
@@ -153,7 +158,7 @@ void loop() {
   lastBut1 = reading1;
   lastBut2 = reading2;
   lastBut3 = reading3;
-  lastBut4 = reading4;
+  lastBut4 = reading4; //update the last button state to the present state
   lastBut5 = reading5;
   lastBut6 = reading6;
   lastBut7 = reading7;
